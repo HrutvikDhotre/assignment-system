@@ -1,23 +1,19 @@
 import { message } from 'antd';
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useAuthContext } from '../contexts/AuthContextProvider'
+import axiosInstance from '../config/axiosConfig';
 
 const User = () => {
   const { currentColour } = useOutletContext();
   const [formData, setFormData] = useState({ task: '', adminId: '' });
   const [adminOptions, setAdminOptions] = useState([])
-  const [user,setUser] = useState(JSON.parse(sessionStorage.getItem('user')) || {})
-  // const adminOptions = [
-  //   { id: '1', name: 'Admin 1' },
-  //   { id: '2', name: 'Admin 2' },
-  //   { id: '3', name: 'Admin 3' },
-  // ];
+  const { user, setUser } = useAuthContext()
 
   useEffect(() => {
     const fetchAdminOptions = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/users/admins')
+        const response = await axiosInstance.get('http://localhost:3000/users/admins')
         const options = response.data.map((data) => {
           return {
             name: data.name,
@@ -26,7 +22,12 @@ const User = () => {
         })
         setAdminOptions(options)
       } catch (err) {
-        message.error("Failed to fetch admin data")
+        if (err.response && err.response.status === 401) {
+          navigate('/')
+          message.error('Session expired, please login again.')
+        } else {
+          message.error("Failed to fetch admin data");
+        }
       }
     }
     fetchAdminOptions()
@@ -52,17 +53,14 @@ const User = () => {
 
   const handleUpload = async () => {
     try {
-      console.log(formData)
-      console.log(user)
-      const response = await axios.post('http://localhost:3000/users/upload', {
-        userId: user.userId,
+      const response = await axiosInstance.post('http://localhost:3000/users/upload', {
         adminId: formData.adminId,
         task: formData.task
       })
 
       if (response.status === 201) {
-         message.success('Assignment uploaded successfully')
-         setFormData({ task: '', adminId: '' })
+        message.success('Assignment uploaded successfully')
+        setFormData({ task: '', adminId: '' })
       }
     } catch (error) {
       console.log(error)

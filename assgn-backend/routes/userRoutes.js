@@ -1,10 +1,9 @@
 const express = require('express')
 const { uploadAssignment, getAllAdmins } = require('../controllers/userController')
-
+const authMiddleware = require('../middlewares/authMiddleware')
 const router = express.Router()
 
-// router.post('/register', registerUser)
-// router.post('/login', loginUser)
+router.use(authMiddleware)
 router.post('/upload', uploadAssignment)
 router.get('/admins', getAllAdmins)
 

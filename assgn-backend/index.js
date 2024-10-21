@@ -10,7 +10,7 @@ app.use(cors())
 
 app.use('/users', userRoutes)
 app.use('/admins', adminRoutes)
-app.use('/',authRoutes)
+app.use('/', authRoutes)
 
 const PORT = 3000
 mongoose.connect('mongodb://localhost:27017/assignmentDB').then(() => {

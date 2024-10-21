@@ -1,15 +1,16 @@
-import React,{useState} from 'react'
+import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { RxCross2 } from 'react-icons/rx'
-import { links,adminLinks } from '../data/sidebardata'
+import { links, adminLinks } from '../data/sidebardata'
 import { useNavigate } from 'react-router-dom'
-
+import { useAuthContext } from '../contexts/AuthContextProvider'
 
 const Sidebar = ({ setActiveMenu, activeMenu, screenSize, currentColour }) => {
 
   const navigate = useNavigate()
   // const { user, setUser } = useStateContext(
-    const [user,setUser] = useState(JSON.parse(sessionStorage.getItem('user')) || {})
+  // const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')) || {})
+  const { user, setUser } = useAuthContext()
   const handleClick = () => {
     if (screenSize && screenSize < 576) setActiveMenu(false)
   }

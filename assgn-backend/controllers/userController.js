@@ -1,10 +1,10 @@
-const bcrypt = require('bcrypt')
 const User = require('../models/User')
 const Assignment = require('../models/Assignment')
 
 const uploadAssignment = async (req, res) => {
-    const { userId, task, adminId } = req.body
-    console.log(req.body)
+    const { task, adminId } = req.body
+    const userId = req.userId
+
     try {
         const assignment = new Assignment({ userId, task, adminId })
         await assignment.save()
@@ -25,8 +25,6 @@ const getAllAdmins = async (req, res) => {
 }
 
 module.exports = {
-    // registerUser,
-    // loginUser,
     uploadAssignment,
     getAllAdmins
 }

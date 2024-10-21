@@ -1,11 +1,10 @@
-const bcrypt = require('bcrypt')
-const User = require('../models/User')
 const Assignment = require('../models/Assignment')
 
 const getAssignments = async (req, res) => {
-    const { adminId } = req.query
+    const adminId = req.userId
     try {
         const assignments = await Assignment.find({ adminId }).populate('userId', 'name')
+        console.log(assignments)
         res.status(201).json(assignments)
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch assignments' })
@@ -36,6 +35,4 @@ module.exports = {
     getAssignments,
     acceptAssignment,
     rejectAssignment,
-    // loginAdmin,
-    // registerAdmin
 }
