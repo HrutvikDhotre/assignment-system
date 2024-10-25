@@ -29,10 +29,13 @@ const register = async (req, res) => {
     }
 }
 
+
 const login = async (req, res) => {
-    const { username, password, role } = req.body
+    const { username, password } = req.body
+
     try {
         const user = await User.findOne({ username })
+
         if (user && await bcrypt.compare(password, user.password)) {
             const token = createToken(user._id)
             res.status(201).json({ message: 'Login successful', token, userRole: user.role })
@@ -40,11 +43,35 @@ const login = async (req, res) => {
             res.status(401).json({ message: 'Invalid credentials' })
         }
     } catch (error) {
-        res.status(500).json({ message: 'Login failed' })
+        res.status(500).json({ message: 'Login failed due to a server error' })
+    }
+};
+
+
+const googleOAuthCallback = async (req, res) => {
+    try {
+
+        const { token, isNewUser, role } = req.user;
+        console.log('token')
+        console.log(token)
+        if (isNewUser) {
+            res.redirect(`http://localhost:5173/select-role?token=${token}`)
+        } else {
+            if (role === 'admin') {
+                res.redirect(`http://localhost:5173/assignments?token=${token}&role=${role}`);
+            } else {
+                res.redirect(`http://localhost:5173/upload-assignment?token=${token}&role=${role}`);
+            }
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server error during authentication' });
     }
 }
 
+
+
 module.exports = {
     login,
-    register
+    register,
+    googleOAuthCallback,
 }

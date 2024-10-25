@@ -4,7 +4,6 @@ const getAssignments = async (req, res) => {
     const adminId = req.userId
     try {
         const assignments = await Assignment.find({ adminId }).populate('userId', 'name')
-        console.log(assignments)
         res.status(201).json(assignments)
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch assignments' })

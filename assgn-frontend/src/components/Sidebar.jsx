@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { RxCross2 } from 'react-icons/rx'
 import { links, adminLinks } from '../data/sidebardata'
@@ -8,9 +8,10 @@ import { useAuthContext } from '../contexts/AuthContextProvider'
 const Sidebar = ({ setActiveMenu, activeMenu, screenSize, currentColour }) => {
 
   const navigate = useNavigate()
-  // const { user, setUser } = useStateContext(
-  // const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')) || {})
   const { user, setUser } = useAuthContext()
+
+
+
   const handleClick = () => {
     if (screenSize && screenSize < 576) setActiveMenu(false)
   }
@@ -63,6 +64,10 @@ const Sidebar = ({ setActiveMenu, activeMenu, screenSize, currentColour }) => {
     </div>
   ))
 
+
+  useEffect(() => { }, [user])
+
+
   return (
     <>
       {activeMenu &&
@@ -80,7 +85,9 @@ const Sidebar = ({ setActiveMenu, activeMenu, screenSize, currentColour }) => {
               </button>
             </div>
             <div className='flex flex-col justify-between h-6/7 collapsed:mt-6'>
+              {/* <div>{user.role === 'admin' || userRole === 'admin' ? getAdminLinks : getLinks}</div> */}
               <div>{user.role === 'admin' ? getAdminLinks : getLinks}</div>
+
             </div>
           </div>
         </div>}

@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken')
 
 const authMiddleware = async (req, res, next) => {
     const { authorization } = req.headers
-
     if (!authorization)
         return res.status(401).json({ message: 'Authorization token required.' })
 
@@ -22,7 +21,6 @@ const authMiddleware = async (req, res, next) => {
             return res.status(401).json({ message: 'Token expired. Please log in again.' });
         else
             return res.status(401).json({ message: 'Not authorized.' });
-
     }
 }
 

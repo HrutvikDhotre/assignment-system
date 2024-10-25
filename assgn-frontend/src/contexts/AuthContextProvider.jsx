@@ -5,12 +5,13 @@ const AuthContext = createContext()
 
 const AuthContextProvider = ({ children }) => {
 
-    const [user, setUser] = useState(null)
-    useEffect(() => {
-        const user = localStorage.getItem('user')
-        if (user)
-            setUser(user)
-    }, [])
+    const [user, setUser] = useState({ token: '', role: '' })
+
+    // useEffect(() => {
+    //     const user = JSON.parse(localStorage.getItem('user'))
+    //     if (user)
+    //         setUser(user)
+    // }, [])
 
     return (
         <AuthContext.Provider

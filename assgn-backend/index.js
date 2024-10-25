@@ -5,9 +5,13 @@ const authRoutes = require('./routes/authRoutes')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const app = express()
+const passport = require('passport')
+require('./config/passport')
+
+
 app.use(express.json())
 app.use(cors())
-
+app.use(passport.initialize())
 app.use('/users', userRoutes)
 app.use('/admins', adminRoutes)
 app.use('/', authRoutes)

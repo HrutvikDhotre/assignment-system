@@ -5,6 +5,7 @@ import axiosInstance from '../config/axiosConfig'
 import { useAuthContext } from '../contexts/AuthContextProvider'
 import { useNavigate } from 'react-router-dom'
 
+
 const Admin = () => {
   const [tableData, setTableData] = useState([])
   // const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')) || {})
@@ -14,7 +15,14 @@ const Admin = () => {
   useEffect(() => {
     const fetchAssignmentDetails = async () => {
       try {
-        const response = await axiosInstance.get('http://localhost:3000/admins/assignments')
+        const user = JSON.parse(localStorage.getItem('user'))
+        console.log(user.token)
+        const response = await axios.get('http://localhost:3000/admins/assignments', {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        })
+        console.log(response.data)
         const filteredData = response.data.map(item => ({
           userName: item.userId.name,
           task: item.task,
@@ -24,15 +32,20 @@ const Admin = () => {
 
         setTableData(filteredData)
       } catch (error) {
-        if (error.response && response.status === 401) {
+        if (error.response && error.response.status === 401) {
           navigate('/')
           message.error('Session expired, please login again.')
-        }else
-        message.error("Failed to fetch assignment details")
+        }
+        // else{
+        //   console.log('above')
+        //   console.log(error)
+        //   message.error("Failed to fetch assignment details")
+        // }
       }
     }
     fetchAssignmentDetails()
   }, [])
+
 
   const handleStatusChange = async (record, newStatus) => {
     try {
@@ -40,7 +53,12 @@ const Admin = () => {
         ? `http://localhost:3000/admins/assignments/${record._id}/reject`
         : `http://localhost:3000/admins/assignments/${record._id}/accept`
 
-      await axiosInstance.put(url)
+      await axios.put(url, null, {
+        headers: {
+          Authorization: `Bearer ${user.token}`
+        }
+      })
+
       message.success(`Status updated`)
       setTableData(prev =>
         prev.map(item => (item._id === record._id ? { ...item, status: newStatus } : item))

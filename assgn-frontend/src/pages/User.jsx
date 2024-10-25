@@ -1,33 +1,42 @@
 import { message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext,useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContextProvider'
 import axiosInstance from '../config/axiosConfig';
-
+import axios from 'axios';
 const User = () => {
   const { currentColour } = useOutletContext();
   const [formData, setFormData] = useState({ task: '', adminId: '' });
   const [adminOptions, setAdminOptions] = useState([])
   const { user, setUser } = useAuthContext()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchAdminOptions = async () => {
       try {
-        const response = await axiosInstance.get('http://localhost:3000/users/admins')
+        const user = JSON.parse(localStorage.getItem('user'))
+        const response = await axios.get('http://localhost:3000/users/admins', {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        })
         const options = response.data.map((data) => {
           return {
             name: data.name,
             id: data._id
           }
         })
+        console.log('response',response)
         setAdminOptions(options)
       } catch (err) {
         if (err.response && err.response.status === 401) {
           navigate('/')
           message.error('Session expired, please login again.')
-        } else {
-          message.error("Failed to fetch admin data");
         }
+        //  else {
+        //   console.log(err)
+        //   message.error("Failed to fetch admin data");
+        // }
       }
     }
     fetchAdminOptions()
@@ -53,10 +62,18 @@ const User = () => {
 
   const handleUpload = async () => {
     try {
-      const response = await axiosInstance.post('http://localhost:3000/users/upload', {
-        adminId: formData.adminId,
-        task: formData.task
-      })
+     const response = await axios.post(
+        'http://localhost:3000/users/upload',
+        {
+          adminId: formData.adminId,
+          task: formData.task
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      )
 
       if (response.status === 201) {
         message.success('Assignment uploaded successfully')

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react'
 import Sidebar from './Sidebar'
 import { Outlet } from 'react-router-dom'
 import ThemeSideBar from './ThemeSideBar'
+import Navbar from './Navbar'
 
 const Layout = () => {
   const [darkMode, setDarkMode] = useState(false)
   const [activeMenu, setActiveMenu] = useState(true)
   const [screenSize, setScreenSize] = useState(undefined)
   const [currentColour, setCurrentColour] = useState('#72CC50')
+
 
   useEffect(() => {
     const currentColour = localStorage.getItem('currentColour')
@@ -55,7 +57,14 @@ const Layout = () => {
           className={`flex-grow flex-shrink w-[80%] bg-white dark:bg-gray-800 ${screenSize < 576 ? 'ml-0' : 'vertical:ml-[20%] collapsed:ml-16 horizontal:ml-0'
             } shadow-skin:bg-main dark:shadow-skin:bg-gray-900`}
         >
-          <div className="px-5 ">
+          <Navbar
+            setActiveMenu={setActiveMenu}
+            currentColour={currentColour}
+            activeMenu={activeMenu}
+            screenSize={screenSize}
+
+          />
+          <div className="px-5 mt-5 sm:mt-24">
             <Outlet context={{ currentColour }} />
           </div>
         </div>

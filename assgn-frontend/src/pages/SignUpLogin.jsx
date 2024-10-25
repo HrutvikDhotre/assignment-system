@@ -3,6 +3,8 @@ import axios from 'axios'
 import { message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../contexts/AuthContextProvider'
+import { FcGoogle } from "react-icons/fc"
+import { FaGoogle } from "react-icons/fa"
 
 const SignUpLogin = () => {
     const [currentColour, setCurrentColour] = useState('#72CC50')
@@ -27,13 +29,6 @@ const SignUpLogin = () => {
         }
     }, [])
 
-    // useEffect(()=>{
-    //     const storageUser = JSON.parse(localStorage.getItem('user'))
-    //     if(storageUser){
-    //         setUser(storageUser)
-    //         storageUser.role === 'admin' ? navigate('/assignments') : navigate('/upload-assignment')
-    //     }
-    // },[])
 
     const handleFocus = (e) => {
         e.target.style.border = `1.5px solid ${currentColour}`
@@ -89,31 +84,35 @@ const SignUpLogin = () => {
 
     const handleLogin = async () => {
         const { username, password } = formData
+
         if (!username || !password) {
             message.error('Please fill in all fields')
             return
         }
 
         setLoading(true)
+
         try {
             const url = 'http://localhost:3000/login'
-            const response = await axios.post(url, {
-                username,
-                password
-            })
-
-
+            const response = await axios.post(url, { username, password })
 
             if (response.status === 201) {
                 message.success('Logged in successfully!')
-                response.data.userRole === 'admin' ? navigate('/assignments') : navigate('/upload-assignment')
-                // sessionStorage.setItem('user', JSON.stringify({ userId: response.data.userId, role: response.data.userRole }))
-                setUser({ token: response.data.token, role: response.data.userRole })
-                localStorage.setItem('user', JSON.stringify({ token: response.data.token, role: response.data.userRole }))
+                const { token, userRole } = response.data
+                setUser({ token, role: userRole })
+                localStorage.setItem('user', JSON.stringify({ token, role: userRole }))
+
+                userRole === 'admin' ? navigate('/assignments') : navigate('/upload-assignment')
+            } else if (response.status === 401) {
+                message.error('Invalid credentials. Please try again.')
             }
         } catch (error) {
-            message.error('An error occurred while logging in')
-            console.log(error)
+            if (error.response && error.response.status === 500) {
+                message.error('Server error. Please try again later.')
+            } else {
+                message.error('An error occurred while logging in')
+            }
+            console.error('Login error:', error)
         } finally {
             setLoading(false)
         }
@@ -164,6 +163,10 @@ const SignUpLogin = () => {
         }
     }
 
+    const handleGoogleLogin = () => {
+        window.location.href = 'http://localhost:3000/auth/google'
+    }
+
     return (
         <>
             {showLoginForm && (
@@ -204,6 +207,12 @@ const SignUpLogin = () => {
                                 disabled={loading}
                             >
                                 {loading ? 'Logging in...' : 'Login'}
+                            </button>
+                            <button
+                                onClick={handleGoogleLogin}
+                                className='mt-3 rounded-md w-full active:scale-105 transition-transform duration-300 ease-in-out  p-2 bg-blue-100 text-gray-900 flex justify-center items-center'
+                            >
+                                <FcGoogle className='mx-2' size={22} />    Login with Google
                             </button>
                             <button
                                 className='float-end mt-1.5 p-0 text-blue-400 hover:text-blue-600 text-xs'
@@ -304,7 +313,7 @@ const SignUpLogin = () => {
                                 </label>
                             </div>
                         </div>
-                        <div className='w-full px-5'>
+                        <div className='w-full space-y-4 px-5'>
                             <button
                                 style={{ backgroundColor: currentColour }}
                                 className='rounded-md w-full active:scale-105 transition-transform duration-300 ease-in-out hover:bg-opacity-0 text-white p-2'
@@ -312,6 +321,12 @@ const SignUpLogin = () => {
                                 disabled={loading || passwordError}
                             >
                                 {loading ? 'Registering...' : 'Register'}
+                            </button>
+                            <button
+                                onClick={handleGoogleLogin}
+                                className='rounded-md w-full active:scale-105 transition-transform duration-300 ease-in-out  p-2 bg-blue-100 text-gray-900 flex justify-center items-center'
+                            >
+                                <FcGoogle className='mx-2' size={22} />    Signup with Google
                             </button>
                             <button
                                 className='float-end mt-1.5 p-0 text-blue-400 hover:text-blue-600 text-xs'
